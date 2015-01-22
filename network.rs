@@ -1,5 +1,12 @@
+use std::num::Float;
+use std::f64::consts;
 use std::fmt;
 use std::rand;
+
+// sigmoid
+fn sigmoid(x : f64) -> f64 {
+    return 1.0 / (1.0 + std::f64::consts::E.powf(-x)); 
+}
 
 // A neuron is a collection of weights
 struct Neuron {
@@ -17,6 +24,14 @@ impl Neuron {
         } 
 
         return Neuron{ weights: weights } 
+    }
+
+    fn feed(&self, pattern: Vec<f64>) -> f64 {
+        let mut sum = 0.0;
+        for i in range(0, pattern.len()) {
+            sum += pattern[i] * self.weights[i];
+        }
+        return sigmoid(sum);
     }
 }
 
@@ -40,8 +55,17 @@ impl Layer {
             neurons.push(neuron);
         }
 
-        return Layer{ neurons: neurons } 
+        return Layer{ neurons: neurons }; 
     }
+
+    //fn feed(&self, pattern : Vec<f64>) -> Vec<f64> {
+    //    let mut output = Vec::new();
+
+    //    for neuron in self.neurons.iter() {
+    //        output.push(neuron.feed(pattern));
+    //    }
+    //    return output;
+    //}
 }
 
 impl std::fmt::Show for Layer {
@@ -60,13 +84,16 @@ struct Network {
 }
 
 impl Network {
-    fn new(num_inputs : i64, num_hidden : i64, num_outputs : i64) -> Network {
+    fn new(topology : Vec<i64>) -> Network {
         let mut layers = Vec::new();
 
-        layers.push(Layer::new(num_outputs, num_hidden));
-        layers.push(Layer::new(num_hidden, num_inputs));
+        for i in range(0, topology.len() - 1) {
+            let num_inputs = topology[i];
+            let num_outputs = topology[i+1];
+            layers.push(Layer::new(num_outputs, num_inputs));
+        }
 
-        return Network{ layers: layers } 
+        return Network{ layers: layers }; 
     }
 }
 
@@ -81,6 +108,7 @@ impl std::fmt::Show for Network {
 }
 
 fn main() {
-    let network = Network::new(2, 3, 1);
+    let topology = vec!(2, 3, 1);
+    let network = Network::new(topology);
     println!("{:?}", network);
 }
