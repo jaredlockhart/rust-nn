@@ -3,4 +3,8 @@ Rust Neural Network
 
 ## Example
     ./network 
-    Neuron: Weights: [0.514711f64, 0.802097f64, -0.571243f64]
+    Weights: [-0.623728f64, -0.326597f64, 0.611181f64]
+    Layer:
+    Neuron: Weights: [-0.643295f64, 0.886096f64]
+    Neuron: Weights: [-0.553359f64, 0.81713f64]
+    Neuron: Weights: [-0.124561f64, -0.737586f64]
