@@ -2,8 +2,12 @@
 Rust Neural Network
 
 ## Example
-    ./network
-    Layer:
-            Neuron: [0.864469f64, -0.981571f64]
-            Neuron: [0.56995f64, -0.673345f64]
-            Neuron: [0.753381f64, 0.397846f64]
+    ./network 
+    Network:
+            Layer:
+            Neuron: [0.063353f64, -0.924558f64, -0.52399f64]
+    
+            Layer:
+            Neuron: [-0.214653f64, -0.041331f64]
+            Neuron: [-0.594611f64, 0.588007f64]
+            Neuron: [-0.708291f64, -0.800846f64]

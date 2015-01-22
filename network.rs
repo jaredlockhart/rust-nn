@@ -6,7 +6,6 @@ struct Neuron {
     weights : Vec<f64> 
 }
 
-
 impl Neuron {
     fn new(num_weights: i64) -> Neuron {
         let mut weights = Vec::new(); 
@@ -27,6 +26,7 @@ impl std::fmt::Show for Neuron {
     }
 }
 
+// A layer is a collection of Neurons
 struct Layer {
     neurons : Vec<Neuron>
 }
@@ -54,11 +54,33 @@ impl std::fmt::Show for Layer {
     }
 }
 
+// A Network is a collection of Layers
 struct Network {
     layers: Vec<Layer>
 }
 
+impl Network {
+    fn new(num_inputs : i64, num_hidden : i64, num_outputs : i64) -> Network {
+        let mut layers = Vec::new();
+
+        layers.push(Layer::new(num_outputs, num_hidden));
+        layers.push(Layer::new(num_hidden, num_inputs));
+
+        return Network{ layers: layers } 
+    }
+}
+
+impl std::fmt::Show for Network {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "Network:\n");
+        for layer in self.layers.iter() {
+            write!(formatter, "\t{:?}\n", layer);
+        }
+        return write!(formatter, "\n");
+    }
+}
+
 fn main() {
-    let layer = Layer::new(3, 2);
-    println!("{:?}", layer);
+    let network = Network::new(2, 3, 1);
+    println!("{:?}", network);
 }
