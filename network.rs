@@ -26,7 +26,7 @@ impl Neuron {
         return Neuron{ weights: weights } 
     }
 
-    fn feed(&self, pattern: Vec<f64>) -> f64 {
+    fn feed(&self, pattern: &Vec<f64>) -> f64 {
         let mut sum = 0.0;
         for i in range(0, pattern.len()) {
             sum += pattern[i] * self.weights[i];
@@ -58,14 +58,14 @@ impl Layer {
         return Layer{ neurons: neurons }; 
     }
 
-    //fn feed(&self, pattern : Vec<f64>) -> Vec<f64> {
-    //    let mut output = Vec::new();
+    fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
+        let mut output = Vec::new();
 
-    //    for neuron in self.neurons.iter() {
-    //        output.push(neuron.feed(pattern));
-    //    }
-    //    return output;
-    //}
+        for neuron in self.neurons.iter() {
+            output.push(neuron.feed(pattern));
+        }
+        return output;
+    }
 }
 
 impl std::fmt::Show for Layer {
@@ -95,6 +95,15 @@ impl Network {
 
         return Network{ layers: layers }; 
     }
+
+    fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
+        let mut output = pattern.clone();
+
+        for layer in self.layers.iter() {
+            output = layer.feed(&output);
+        }
+        return output;
+    }
 }
 
 impl std::fmt::Show for Network {
@@ -108,7 +117,10 @@ impl std::fmt::Show for Network {
 }
 
 fn main() {
-    let topology = vec!(2, 3, 1);
-    let network = Network::new(topology);
+    let input = vec!(1.0, 1.0);
+    let network = Network::new(vec!(2, 3, 1));
+    let output = network.feed(&input);
     println!("{:?}", network);
+    println!("Input: {:?}", input);
+    println!("Output: {:?}", output);
 }
