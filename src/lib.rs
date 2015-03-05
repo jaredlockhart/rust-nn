@@ -1,29 +1,31 @@
+#![feature(core)]
+
 use std::num::Float;
-use std::f64::consts;
 use std::fmt;
-use std::rand;
+extern crate rand;
 
 // sigmoid
 fn sigmoid(x : f64) -> f64 {
-    return 1.0 / (1.0 + std::f64::consts::E.powf(-x)); 
+    return 1.0 / (1.0 + std::f64::consts::E.powf(-x));
 }
 
 // A neuron is a collection of weights
-struct Neuron {
-    weights : Vec<f64> 
+#[derive(Debug)]
+pub struct Neuron {
+    weights : Vec<f64>
 }
 
 impl Neuron {
     fn new(num_weights: i64) -> Neuron {
-        let mut weights = Vec::new(); 
+        let mut weights = Vec::new();
 
         for _ in range(0, num_weights) {
             // A random weight in [-1.0, 1.0]
             let weight = rand::random::<f64>() * 2.0 - 1.0;
             weights.push(weight);
-        } 
+        }
 
-        return Neuron{ weights: weights } 
+        return Neuron{ weights: weights }
     }
 
     fn feed(&self, pattern: &Vec<f64>) -> f64 {
@@ -35,14 +37,15 @@ impl Neuron {
     }
 }
 
-impl std::fmt::Show for Neuron {
+impl fmt::Display for Neuron {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "Neuron: {:?}", self.weights)
     }
 }
 
 // A layer is a collection of Neurons
-struct Layer {
+#[derive(Debug)]
+pub struct Layer {
     neurons : Vec<Neuron>
 }
 
@@ -55,7 +58,7 @@ impl Layer {
             neurons.push(neuron);
         }
 
-        return Layer{ neurons: neurons }; 
+        return Layer{ neurons: neurons };
     }
 
     fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
@@ -68,7 +71,7 @@ impl Layer {
     }
 }
 
-impl std::fmt::Show for Layer {
+impl fmt::Display for Layer {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "Layer:\n");
         for neuron in self.neurons.iter() {
@@ -79,12 +82,13 @@ impl std::fmt::Show for Layer {
 }
 
 // A Network is a collection of Layers
-struct Network {
+#[derive(Debug)]
+pub struct Network {
     layers: Vec<Layer>
 }
 
 impl Network {
-    fn new(topology : Vec<i64>) -> Network {
+    pub fn new(topology : Vec<i64>) -> Network {
         let mut layers = Vec::new();
 
         for i in range(0, topology.len() - 1) {
@@ -93,10 +97,10 @@ impl Network {
             layers.push(Layer::new(num_outputs, num_inputs));
         }
 
-        return Network{ layers: layers }; 
+        return Network{ layers: layers };
     }
 
-    fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
+    pub fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
         let mut output = pattern.clone();
 
         for layer in self.layers.iter() {
@@ -106,7 +110,7 @@ impl Network {
     }
 }
 
-impl std::fmt::Show for Network {
+impl fmt::Display for Network {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "Network:\n");
         for layer in self.layers.iter() {
@@ -116,11 +120,3 @@ impl std::fmt::Show for Network {
     }
 }
 
-fn main() {
-    let input = vec!(1.0, 1.0);
-    let network = Network::new(vec!(2, 3, 1));
-    let output = network.feed(&input);
-    println!("{:?}", network);
-    println!("Input: {:?}", input);
-    println!("Output: {:?}", output);
-}
