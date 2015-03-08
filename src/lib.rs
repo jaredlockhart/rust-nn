@@ -73,11 +73,36 @@ impl Layer {
 
 impl fmt::Display for Layer {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Layer:\n");
+        let _ = write!(formatter, "Layer:\n");
         for neuron in self.neurons.iter() {
-            write!(formatter, "\t{:?}\n", neuron);
+            let _ = write!(formatter, "\t{:?}\n", neuron);
         }
         return write!(formatter, "\n");
+    }
+}
+
+//#[derive(Debug)]
+struct LayerMatrix {
+    weights: Vec<Vec<f64>>,
+    activation_function: fn(f64) -> f64 // map to range -1..1
+}
+
+impl LayerMatrix {
+    fn new(weights: Vec<Vec<f64>>, activation_function: fn(f64) -> f64) -> LayerMatrix {
+        return LayerMatrix{ weights: weights, activation_function : activation_function };
+    }
+
+    fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
+        let mut output = Vec::with_capacity(self.weights.len());
+
+        for neuron_weights in self.weights.iter() {
+            let mut res = 0f64;
+            for i in 0..neuron_weights.len() {
+                res += neuron_weights[i] * pattern[i];
+            }
+            output.push((self.activation_function)(res));
+        }
+        return output;
     }
 }
 
@@ -112,11 +137,51 @@ impl Network {
 
 impl fmt::Display for Network {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Network:\n");
+        let _ = write!(formatter, "Network:\n");
         for layer in self.layers.iter() {
-            write!(formatter, "\t{:?}\n", layer);
+            let _ = write!(formatter, "\t{:?}\n", layer);
         }
         return write!(formatter, "\n");
     }
 }
 
+// A HopfieldNetwork is a single layer network with matrix compute by hebb or hamming algorithm
+//#[derive(Debug)]
+pub struct HopfieldNetwork {
+    layer: LayerMatrix
+}
+
+impl HopfieldNetwork {
+    pub fn new(patterns: Vec<Vec<f64>>, activation_function: fn(f64) -> f64) -> HopfieldNetwork {
+        let layer = LayerMatrix::new(hebb_study(patterns), activation_function);
+
+        HopfieldNetwork{ layer: layer }
+    }
+
+    pub fn feed(&self, pattern : &Vec<f64>) -> Vec<f64> {
+        self.layer.feed(pattern)
+    }
+}
+
+fn hebb_study(patterns : Vec<Vec<f64>>) -> Vec<Vec<f64>> {
+    let cnt = patterns.len();
+    let size = patterns[0].len();
+    let mut weights : Vec<Vec<f64>> = Vec::with_capacity(size);
+
+    for r in 0..size {
+        weights.push(Vec::with_capacity(size));
+        for c in 0..size {
+            if r == c {
+                weights[r].push(0f64);
+            } else {
+                let mut sum = 0f64;
+                for k in 0..cnt {
+                    sum += patterns[k][r] * patterns[k][c];
+                }
+                weights[r].push(sum);
+            }
+        }
+    }
+
+    weights
+}
