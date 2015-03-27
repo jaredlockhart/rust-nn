@@ -1,7 +1,7 @@
 [package]
 
 name = "neuralnetwork"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Jared Kerim <jared.l.kerim@gmail.com>", "Artem Konenko <yadummer@gmail.com>"]
 
 [dependencies]
