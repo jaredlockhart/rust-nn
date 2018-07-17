@@ -12,10 +12,6 @@ fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
 }
 
-trait Feedable {
-    fn feed(&self, &Vec<f64>) -> Vec<f64>;
-}
-
 #[derive(Debug)]
 struct Neuron {
     weights: Vec<f64>,
@@ -27,14 +23,11 @@ impl Neuron {
             weights: random_weights(num_weights),
         }
     }
-}
 
-impl Feedable for Neuron {
-    fn feed(&self, inputs: &Vec<f64>) -> Vec<f64> {
+    fn feed(&self, inputs: &Vec<f64>) -> f64 {
         let zipped = inputs.iter().zip(self.weights.iter());
         let sum: f64 = zipped.map(|(input, weight)| input * weight).sum();
-        let output = sigmoid(sum);
-        vec![output]
+        sigmoid(sum)
     }
 }
 
@@ -49,15 +42,13 @@ impl Layer {
             neurons: (0..num_outputs).map(|_| Neuron::new(num_inputs)).collect(),
         }
     }
-}
 
-impl Feedable for Layer {
     fn feed(&self, inputs: &Vec<f64>) -> Vec<f64> {
         let mut output: Vec<f64> = Vec::new();
 
         for neuron in self.neurons.iter() {
             let neuron_output = neuron.feed(inputs);
-            output.extend_from_slice(&neuron_output);
+            output.push(neuron_output);
         }
 
         output
@@ -77,12 +68,9 @@ impl Network {
             layer2: Layer::new(num_hidden, num_outputs),
         }
     }
-}
 
-impl Feedable for Network {
     fn feed(&self, inputs: &Vec<f64>) -> Vec<f64> {
-        let layer1_output = self.layer1.feed(inputs);
-        self.layer2.feed(&layer1_output)
+        self.layer2.feed(&self.layer1.feed(inputs))
     }
 }
 
