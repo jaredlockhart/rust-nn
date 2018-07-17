@@ -22,10 +22,10 @@ fn perceptron(inputs: &Vec<f64>, weights: &[f64]) -> f64 {
     )
 }
 
-fn feed_layer(inputs: &Vec<f64>, weights: &[f64]) -> Vec<f64> {
-    weights
+fn feed_layer(inputs: &Vec<f64>, layer_weights: &[f64]) -> Vec<f64> {
+    layer_weights
         .chunks(inputs.len())
-        .map(|input_weights| perceptron(inputs, input_weights))
+        .map(|weights| perceptron(inputs, weights))
         .collect()
 }
 
