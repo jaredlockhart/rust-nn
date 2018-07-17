@@ -26,19 +26,21 @@ fn sigmoid(x: f64) -> f64 {
 
 impl Neuron {
     fn new(num_weights: usize) -> Neuron {
-        Neuron{
-            weights: (0..num_weights).map(|_| random_weight()).collect::<Vec<f64>>()
+        Neuron {
+            weights: (0..num_weights).map(|_| random_weight()).collect(),
         }
     }
 }
 
 impl Feedable for Neuron {
-    fn feed(&self, input: Vec<f64>) -> Vec<f64> {
-        let mut sum = 0.0;
-        for (input_n, f64) in input.iter().zip(self.weights.iter()) {
-            sum += input_n * f64;
-        }
-        vec![sigmoid(sum)]
+    fn feed(&self, inputs: Vec<f64>) -> Vec<f64> {
+        vec![sigmoid(
+            inputs
+                .iter()
+                .zip(self.weights.iter())
+                .map(|(input, weight)| input * weight)
+                .sum(),
+        )]
     }
 }
 
