@@ -16,37 +16,38 @@ fn random_weight() -> f64 {
     if sign {
         magnitude
     } else {
-        -1.0 * magnitude
+        -magnitude
     }
 }
 
+fn random_vector(size: usize) -> Vec<f64> {
+    (0..size).map(|_| random_weight()).collect()
+}
+
 fn sigmoid(x: f64) -> f64 {
-    1.0 / (1.0 + (-1.0 * x).exp())
+    1.0 / (1.0 + (-x).exp())
 }
 
 impl Neuron {
     fn new(num_weights: usize) -> Neuron {
         Neuron {
-            weights: (0..num_weights).map(|_| random_weight()).collect(),
+            weights: random_vector(num_weights),
         }
     }
 }
 
 impl Feedable for Neuron {
     fn feed(&self, inputs: Vec<f64>) -> Vec<f64> {
-        vec![sigmoid(
-            inputs
-                .iter()
-                .zip(self.weights.iter())
-                .map(|(input, weight)| input * weight)
-                .sum(),
-        )]
+        let zipped = inputs.iter().zip(self.weights.iter());
+        let sum = zipped.map(|(input, weight)| input * weight).sum::<f64>();
+        let output = sigmoid(sum);
+        vec![output]
     }
 }
 
 fn main() {
     let neuron = Neuron::new(3);
-    let output = neuron.feed(vec![2.0, 2.0, 2.0]);
+    let output = neuron.feed(random_vector(3));
     println!("Hello, neuron: {:?}", neuron);
     println!("Output: {:?}", output);
 }
