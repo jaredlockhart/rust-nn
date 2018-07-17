@@ -1,7 +1,4 @@
 extern crate rand;
-extern crate rayon;
-
-use rayon::prelude::*;
 
 fn random_weight() -> f64 {
     (rand::random::<f64>() * 2.0) - 1.0
@@ -49,9 +46,9 @@ impl Network {
     }
 
     fn feed(&self, inputs: &Vec<f64>) -> Vec<f64> {
-        let layer_cutoff = self.inputs * self.hidden;
-        let layer1_output = feed_layer(inputs, &self.weights[..layer_cutoff]);
-        feed_layer(&layer1_output, &self.weights[layer_cutoff..])
+        let cutoff = self.inputs * self.hidden;
+        let output = feed_layer(inputs, &self.weights[..cutoff]);
+        feed_layer(&output, &self.weights[cutoff..])
     }
 }
 
