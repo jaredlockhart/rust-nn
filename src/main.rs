@@ -64,10 +64,9 @@ impl Network {
 }
 
 fn main() {
-    let network = Network::new_random(2, 3, 1);
-    let input = vec![1.0, 1.0];
+    let size = 2621440;
+    let network = Network::new_random(size, 100, size);
+    let input = random_weights(size);
     let output = network.feed(&input);
-    println!("Hello, network: {:?}", network);
-    println!("\nInput: {:?}", input);
-    println!("\nOutput: {:?}", output);
+    assert_eq!(output.len(), size);
 }
