@@ -32,7 +32,7 @@ impl Neuron {
 impl Feedable for Neuron {
     fn feed(&self, inputs: &Vec<f64>) -> Vec<f64> {
         let zipped = inputs.iter().zip(self.weights.iter());
-        let sum = zipped.map(|(input, weight)| input * weight).sum::<f64>();
+        let sum: f64 = zipped.map(|(input, weight)| input * weight).sum();
         let output = sigmoid(sum);
         vec![output]
     }
@@ -44,9 +44,9 @@ struct Layer {
 }
 
 impl Layer {
-    fn new(num_neurons: usize, num_inputs: usize) -> Self {
+    fn new(num_inputs: usize, num_outputs: usize) -> Self {
         Layer {
-            neurons: (0..num_neurons).map(|_| Neuron::new(num_inputs)).collect(),
+            neurons: (0..num_outputs).map(|_| Neuron::new(num_inputs)).collect(),
         }
     }
 }
@@ -64,11 +64,37 @@ impl Feedable for Layer {
     }
 }
 
+#[derive(Debug)]
+struct Network {
+    layer1: Layer,
+    layer2: Layer,
+}
+
+impl Network {
+    fn new(num_inputs: usize, num_hidden: usize, num_outputs: usize) -> Self {
+        Network {
+            layer1: Layer::new(num_inputs, num_hidden),
+            layer2: Layer::new(num_hidden, num_outputs),
+        }
+    }
+}
+
+impl Feedable for Network {
+    fn feed(&self, inputs: &Vec<f64>) -> Vec<f64> {
+        let layer1_output = self.layer1.feed(inputs);
+        self.layer2.feed(&layer1_output)
+    }
+}
+
 fn main() {
     let neuron = Neuron::new(3);
-    let output = neuron.feed(&random_weights(3));
     let layer = Layer::new(2, 3);
+    let network = Network::new(2, 3, 1);
+    let input = vec![1.0, 1.0];
+    let output = network.feed(&input);
     println!("Hello, neuron: {:?}", neuron);
     println!("Hello, layer: {:?}", layer);
-    println!("Output: {:?}", output);
+    println!("Hello, network: {:?}", network);
+    println!("\nInput: {:?}", input);
+    println!("\nOutput: {:?}", output);
 }
