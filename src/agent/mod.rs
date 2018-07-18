@@ -1,5 +1,6 @@
 mod network;
 
+use agent::network::Network;
 use std::cmp::Ordering;
 
 fn cmp_f64(a: f64, b: f64) -> Ordering {
@@ -20,7 +21,7 @@ fn signal_error(samples: Vec<f64>, targets: &[f64]) -> f64 {
         .sqrt()
 }
 
-fn xor_trial(network: &network::Network) -> f64 {
+fn xor_trial(network: &Network) -> f64 {
     let trials = [
         ([0.0, 0.0], [0.0]),
         ([0.0, 1.0], [1.0]),
@@ -35,14 +36,14 @@ fn xor_trial(network: &network::Network) -> f64 {
 
 struct Agent {
     score: f64,
-    network: network::Network,
+    network: Network,
 }
 
 pub fn generation(popsize: usize) {
     let mut agents: Vec<Agent> = Vec::new();
 
     for agent_i in 0..popsize {
-        let network = network::Network::new_random(2, 3, 1);
+        let network = Network::new_random(2, 3, 1);
         let score = xor_trial(&network);
         agents.push(Agent {
             score: score,
