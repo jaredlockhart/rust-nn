@@ -1,6 +1,6 @@
-mod network;
+extern crate rand;
 
-use agent::network::Network;
+use network::Network;
 use std::cmp::Ordering;
 
 fn cmp_f64(a: f64, b: f64) -> Ordering {
@@ -37,6 +37,12 @@ fn xor_trial(network: &Network) -> f64 {
 struct Agent {
     score: f64,
     network: Network,
+}
+
+impl Agent {
+    fn breed(&mut self, partner: &mut Agent) {
+        let crossover = rand::random::<usize>() % self.network.weights.len();
+    }
 }
 
 pub fn generation(popsize: usize) {

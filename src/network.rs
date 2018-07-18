@@ -33,7 +33,7 @@ fn feed_layer(inputs: &Vec<f64>, layer_weights: &[f64]) -> Vec<f64> {
 pub struct Network {
     inputs: usize,
     hidden: usize,
-    weights: Vec<f64>,
+    pub weights: Vec<f64>,
 }
 
 impl Network {
