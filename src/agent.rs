@@ -46,16 +46,16 @@ impl Agent {
 }
 
 pub fn generation(popsize: usize) {
-    let mut agents: Vec<Agent> = Vec::new();
-
-    for agent_i in 0..popsize {
-        let network = Network::new_random(2, 3, 1);
-        let score = xor_trial(&network);
-        agents.push(Agent {
-            score: score,
-            network: network,
-        });
-    }
+    let mut agents: Vec<Agent> = (0..popsize)
+        .map(|_| {
+            let network = Network::new_random(2, 3, 1);
+            let score = xor_trial(&network);
+            Agent {
+                score: score,
+                network: network,
+            }
+        })
+        .collect();
 
     agents[..].sort_unstable_by(|a, b| cmp_f64(b.score, a.score));
     for agent in agents.iter() {
