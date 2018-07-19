@@ -29,7 +29,7 @@ fn feed_layer(inputs: &Vec<f64>, layer_weights: &[f64]) -> Vec<f64> {
         .collect()
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Network {
     pub inputs: usize,
     pub hidden: usize,

@@ -3,7 +3,6 @@ extern crate rand;
 use network::random_weight;
 use network::Network;
 use std::cmp::Ordering;
-use std::rc::Rc;
 
 fn cmp_f64(a: f64, b: f64) -> Ordering {
     if a < b {
@@ -36,7 +35,7 @@ fn xor_trial(network: &Network) -> f64 {
 }
 
 impl Network {
-    fn breed(&self, partner: &Rc<Network>) -> Rc<Network> {
+    fn breed(&self, partner: &Network) -> Network {
         let mut new_weights: Vec<f64> = Vec::new();
 
         // Crossover
@@ -64,55 +63,45 @@ impl Network {
         assert_eq!(self.weights.len(), new_weights.len());
 
         // Child
-        Rc::new(Network {
+        Network {
             inputs: self.inputs,
             hidden: self.hidden,
             weights: new_weights,
             score: self.score,
-        })
+        }
     }
 }
 
-pub fn random_population(popsize: usize) -> Vec<Rc<Network>> {
-    (0..popsize)
-        .map(|_| Rc::new(Network::new_random(2, 3, 1)))
-        .collect()
+pub fn random_population(popsize: usize) -> Vec<Network> {
+    (0..popsize).map(|_| Network::new_random(2, 3, 1)).collect()
 }
 
-fn random_mate(population: &Vec<Rc<Network>>) -> &Rc<Network> {
+fn random_mate(population: &Vec<Network>) -> &Network {
     &population[rand::random::<usize>() % population.len()]
 }
 
-pub fn generation(population: Vec<Rc<Network>>) -> Vec<Rc<Network>> {
-    let mut scored_networks: Vec<(f64, &Rc<Network>)> = population
+pub fn generation<'a>(population: Vec<Network>) -> Vec<Network> {
+    let mut scored_networks: Vec<(f64, &Network)> = population
         .iter()
         .map(|network| (xor_trial(network), network))
         .collect();
 
     scored_networks[..].sort_unstable_by(|(a, _), (b, _)| cmp_f64(*b, *a));
 
-    let mut improved_networks: Vec<(f64, Rc<Network>)> = scored_networks
-        .iter()
-        .map(|(new_score, network)| ((new_score - network.score), Rc::clone(network)))
-        .collect();
-
-    improved_networks[..].sort_unstable_by(|(a, _), (b, _)| cmp_f64(*b, *a));
-
     let (top_score, top_network) = &scored_networks[0];
-    let (improved_score, improved_network) = &improved_networks[0];
     let (bottom_score, bottom_network) = &scored_networks[scored_networks.len() - 1];
     println!(
-        "Top Score: {:?} Impoved Score: {:?} Bottom Score: {:?}",
-        top_score, improved_score, bottom_score
+        "Top Score: {:?} Bottom Score: {:?}",
+        top_score, bottom_score
     );
 
-    let mut new_population: Vec<Rc<Network>> = Vec::new();
+    let mut new_population: Vec<Network> = Vec::new();
 
     // Top performers
     let top_cutoff = (scored_networks.len() as f64 * 0.1) as usize;
     let top_networks = &scored_networks[..top_cutoff];
     for (_, network) in top_networks {
-        new_population.push(Rc::clone(network));
+        new_population.push((**network).clone());
     }
 
     // Top performers children
@@ -123,7 +112,7 @@ pub fn generation(population: Vec<Rc<Network>>) -> Vec<Rc<Network>> {
     }
 
     // Random population members
-    let random_networks: Vec<&Rc<Network>> = population
+    let random_networks: Vec<&Network> = population
         .iter()
         .filter(|_| rand::random::<usize>() % 3 == 0)
         .collect();
@@ -136,7 +125,7 @@ pub fn generation(population: Vec<Rc<Network>>) -> Vec<Rc<Network>> {
     // New Networks
     let networks_remaining = population.len() - new_population.len();
     for _ in 0..networks_remaining {
-        new_population.push(Rc::new(Network::new_random(2, 3, 1)));
+        new_population.push(Network::new_random(2, 3, 1));
     }
 
     assert_eq!(population.len(), new_population.len());
