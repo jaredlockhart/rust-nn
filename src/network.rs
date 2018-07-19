@@ -1,6 +1,6 @@
 extern crate rand;
 
-fn random_weight() -> f64 {
+pub fn random_weight() -> f64 {
     (rand::random::<f64>() * 2.0) - 1.0
 }
 
@@ -31,9 +31,10 @@ fn feed_layer(inputs: &Vec<f64>, layer_weights: &[f64]) -> Vec<f64> {
 
 #[derive(Debug)]
 pub struct Network {
-    inputs: usize,
-    hidden: usize,
+    pub inputs: usize,
+    pub hidden: usize,
     pub weights: Vec<f64>,
+    pub score: f64,
 }
 
 impl Network {
@@ -42,6 +43,7 @@ impl Network {
             inputs: inputs,
             hidden: hidden,
             weights: random_weights((inputs * hidden) + (hidden * outputs)),
+            score: 0.0,
         }
     }
 
